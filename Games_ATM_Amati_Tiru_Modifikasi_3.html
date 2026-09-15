@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games ATM — Amati, Tiru, Modifikasi</title>
+
+<style>
+    :root {
+        --blue: #1769e0;
+        --blue-dark: #0b3f91;
+        --blue-soft: #eaf3ff;
+        --blue-light: #38b6ff;
+        --white: #ffffff;
+        --text: #17324d;
+        --muted: #7890a8;
+        --gold: #ffc107;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        width: 100vw;
+        height: 100vh;
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--blue);
+        color: var(--text);
+        overflow: hidden;
+    }
+
+    .game {
+        width: 100vw;
+        height: 100vh;
+        min-height: 100vh;
+        background: var(--white);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    main {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px 38px;
+        background: #f5f9ff;
+        overflow-y: auto;
+    }
+
+    /* Container Header / Wadah Biru Atas */
+    .top-timer-container {
+        background: var(--blue);
+        color: white;
+        border-radius: 20px;
+        padding: 20px 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(23,105,224,.2);
+        position: relative;
+    }
+
+    .timer-info-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .phase-badge {
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        border-radius: 8px;
+        padding: 6px 18px;
+        font-size: 18px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .phase-name {
+        font-size: 38px;
+        font-weight: 800;
+    }
+
+    .top-timer-box {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .timer-label {
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        opacity: .9;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .timer-num {
+        font-size: 64px;
+        line-height: 1;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .photo-area {
+        flex: 1;
+        min-height: 350px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .photo-box {
+        flex: 1;
+        width: 100%;
+        position: relative;
+        background: white;
+        border: 3px solid var(--blue);
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .photo-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        padding: 10px;
+        display: block;
+        z-index: 2;
+    }
+
+    .hidden-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: var(--blue-soft);
+        color: var(--blue);
+        font-size: 80px;
+        font-weight: 900;
+        user-select: none;
+    }
+
+    /* Container Biru Timer Fase 2 di TENGAH Kotak Foto */
+    .center-timer-container {
+        background: var(--blue);
+        color: white;
+        border-radius: 24px;
+        padding: 30px 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 12px 30px rgba(23,105,224,.35);
+        z-index: 3;
+    }
+
+    .center-timer-container .timer-label {
+        font-size: 18px;
+        letter-spacing: 2px;
+        opacity: .9;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .center-timer-container .timer-num {
+        font-size: 90px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    /* Tombol Navigasi */
+    .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(23, 105, 224, 0.85);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        transition: background 0.2s;
+    }
+
+    .nav-btn:hover {
+        background: var(--blue-dark);
+    }
+
+    .nav-btn.prev {
+        left: 15px;
+    }
+
+    .nav-btn.next {
+        right: 15px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    /* Layar Awal */
+    .start-screen {
+        text-align: center;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .start-screen .icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        border-radius: 24px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        display: grid;
+        place-items: center;
+        font-size: 36px;
+        font-weight: 800;
+    }
+
+    .start-screen h2 {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text);
+    }
+
+    /* Layar Akhir */
+    .result {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, #ffffff 0%, #eaf3ff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 5;
+        padding: 30px;
+        overflow: hidden;
+    }
+
+    .result-content {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popUp {
+        0% { transform: scale(0.8); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .result-content h2 {
+        color: var(--blue-light);
+        font-size: 56px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(56, 182, 255, 0.6)
+        animation: glowPulse 2s infinite alternate ease-in-out;
+    }
+
+    @keyframes glowPulse {
+        0% {
+            text-shadow: 0 0 15px rgba(56, 182, 255, 0.5),
+                        0 0 25px rgba(56, 182, 255, 0.3),
+                        0 0 35px rgba(23, 105, 224, 0.3);
+        }
+        100% {
+            text-shadow: 0 0 25px rgba(56, 182, 255, 0.9),
+                        0 0 40px rgba(56, 182, 255, 0.7),
+                        0 0 60px rgba(23, 105, 224, 0.5);
+        }
+    }
+
+    .result-content p {
+        color: var(--text);
+        font-size: 22px;
+        line-height: 1.5;
+        font-weight: 600;
+    }
+
+    /* Konfeti Canvas */
+    #confetti-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+</style>
+</head>
+
+<body>
+<div class="game">
+
+    <main>
+        <!-- Container Biru Atas -->
+        <div class="top-timer-container" id="topTimerBoxContainer">
+            <div class="timer-info-center">
+                <span class="phase-badge" id="phaseBadge">AMATI, TIRU, MODIFIKASI</span>
+                <span class="phase-name" id="phaseName">Games ATM</span>
+            </div>
+            
+            <div class="top-timer-box hidden" id="topTimerBox">
+                <div class="timer-label" id="timerLabelTop">WAKTU MENGAMATI</div>
+                <div class="timer-num" id="timerTop">SIAP?</div>
+            </div>
+        </div>
+
+        <section class="photo-area">
+            <button class="nav-btn prev hidden" id="btnPrev" onclick="handlePrevAction()" title="Kembali (B / Backspace / Panah Kiri)">❮</button>
+            <button class="nav-btn next hidden" id="btnNext" onclick="handleNextAction()" title="Lanjut (Enter / Panah Kanan)">❯</button>
+
+            <div class="photo-box">
+                <!-- Halaman 1: Tombol Siap Bermain -->
+                <div class="start-screen" id="startScreen">
+                    <div class="icon">▶</div>
+                    <h2>Siap bermain?</h2>
+                </div>
+
+                <div id="hiddenPlaceholder" class="hidden-placeholder hidden">?</div>
+
+                <img id="photo" class="hidden" alt="Foto gerakan ATM">
+
+                <!-- Timer Fase 2 di TENGAH Tempat Foto -->
+                <div class="center-timer-container hidden" id="centerTimerBoxContainer">
+                    <div class="timer-label">WAKTU MEMPERAGAKAN</div>
+                    <div class="timer-num" id="timerBottom">SIAP?</div>
+                </div>
+
+                <!-- Tampilan Akhir / Result Selesai -->
+                <div class="result hidden" id="result">
+                    <canvas id="confetti-canvas"></canvas>
+                    <div class="result-content">
+                        <h2>Luar Biasa!</h2>
+                        <p>Permainan Selesai. Semua tantangan gerakan berhasil diperagakan!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const photos = [
+        "55ccc365493cf38e0e6ba941af249491.jpeg",
+        "20260911_103136.jpeg",
+        "20260911_102052.jpeg",
+        "20260911_102217.jpeg",
+        "20260911_102451.jpeg",
+        "20260911_102644.jpeg",
+        "20260911_102958.jpeg"
+    ];
+
+    const AUDIO_FILE = "tepuk tangan huu.mp3";
+
+    const MEMORIZE_TIME = 15;
+    const RECALL_TIME = 20;
+
+    let currentPhoto = 0;
+    let phase = "memorize";
+    let timeLeft = MEMORIZE_TIME;
+    let timerInterval = null;
+    let gameStarted = false;
+    let isPaused = true;
+    let isPhotoVisible = false;
+
+    const soundEffect = new Audio(AUDIO_FILE);
+
+    const photo = document.getElementById("photo");
+    const hiddenPlaceholder = document.getElementById("hiddenPlaceholder");
+    const startScreen = document.getElementById("startScreen");
+    const result = document.getElementById("result");
+    const timerTop = document.getElementById("timerTop");
+    const timerBottom = document.getElementById("timerBottom");
+    const timerLabelTop = document.getElementById("timerLabelTop");
+    const phaseBadge = document.getElementById("phaseBadge");
+    const phaseName = document.getElementById("phaseName");
+    const topTimerBoxContainer = document.getElementById("topTimerBoxContainer");
+    const topTimerBox = document.getElementById("topTimerBox");
+    const centerTimerBoxContainer = document.getElementById("centerTimerBoxContainer");
+    const btnPrev = document.getElementById("btnPrev");
+    const btnNext = document.getElementById("btnNext");
+
+    function playSound() {
+        soundEffect.currentTime = 0;
+        soundEffect.play().catch(e => console.log("Audio play blocked", e));
+    }
+
+    function updateDisplay() {
+        const displayVal = isPaused ? "SIAP?" : timeLeft;
+
+        if (gameStarted) {
+            btnPrev.classList.remove("hidden");
+            btnNext.classList.remove("hidden");
+        } else {
+            btnPrev.classList.add("hidden");
+            btnNext.classList.add("hidden");
+        }
+
+        if (phase === "memorize") {
+            phaseBadge.textContent = "FASE 1";
+            phaseName.textContent = "Memorize";
+            timerLabelTop.textContent = "WAKTU MENGAMATI";
+            timerTop.textContent = displayVal;
+
+            topTimerBoxContainer.classList.remove("hidden");
+            topTimerBox.classList.remove("hidden");
+            centerTimerBoxContainer.classList.add("hidden");
+
+            if (isPhotoVisible) {
+                photo.classList.remove("hidden");
+                hiddenPlaceholder.classList.add("hidden");
+            } else {
+                photo.classList.add("hidden");
+                hiddenPlaceholder.classList.remove("hidden");
+            }
+        } else if (phase === "recall") {
+            phaseBadge.textContent = "FASE 2";
+            phaseName.textContent = "Recall";
+            topTimerBoxContainer.classList.remove("hidden");
+            topTimerBox.classList.add("hidden");
+
+            timerBottom.textContent = displayVal;
+
+            if (isPhotoVisible) {
+                photo.classList.remove("hidden");
+                centerTimerBoxContainer.classList.add("hidden");
+                hiddenPlaceholder.classList.add("hidden");
+            } else {
+                photo.classList.add("hidden");
+                centerTimerBoxContainer.classList.remove("hidden");
+                hiddenPlaceholder.classList.add("hidden");
+            }
+        }
+    }
+
+    function loadPhoto() {
+        photo.src = photos[currentPhoto];
+        photo.onerror = () => {
+            photo.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' background='%23ddd'><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='%23777'>File Foto: " + photos[currentPhoto] + " Belum Ditemukan</text></svg>";
+        };
+    }
+
+    function startGame() {
+        gameStarted = true;
+        result.classList.add("hidden");
+        startScreen.classList.add("hidden");
+        stopConfetti();
+        currentPhoto = 0;
+        startMemorize();
+    }
+
+    function startMemorize() {
+        phase = "memorize";
+        timeLeft = MEMORIZE_TIME;
+        isPaused = true;
+        isPhotoVisible = false;
+        loadPhoto();
+        updateDisplay();
+        startTimer();
+    }
+
+    function startRecall() {
+        phase = "recall";
+        timeLeft = RECALL_TIME;
+        isPaused = true;
+        isPhotoVisible = false;
+        updateDisplay();
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (isPaused) return;
+
+            timeLeft--;
+            updateDisplay();
+
+            if (timeLeft === 3) {
+                playSound();
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                
+                if (phase === "memorize") {
+                    startRecall();
+                }
+            }
+        }, 1000);
+    }
+
+    function togglePause() {
+        if (!gameStarted) return;
+        isPaused = !isPaused;
+        updateDisplay();
+    }
+
+    function togglePhotoVisibility() {
+        if (!gameStarted && !result.classList.contains("hidden")) {
+            if (photo.classList.contains("hidden")) {
+                photo.classList.remove("hidden");
+                result.classList.add("hidden");
+            } else {
+                photo.classList.add("hidden");
+                result.classList.remove("hidden");
+            }
+            return;
+        }
+
+        if (!gameStarted) return;
+        
+        isPhotoVisible = !isPhotoVisible;
+        updateDisplay();
+    }
+
+    function resetCurrentPhaseTimer() {
+        if (!gameStarted) return;
+        clearInterval(timerInterval);
+        isPaused = true;
+        
+        if (phase === "memorize") {
+            timeLeft = MEMORIZE_TIME;
+        } else if (phase === "recall") {
+            timeLeft = RECALL_TIME;
+        }
+
+        updateDisplay();
+        startTimer();
+    }
+
+    function handleNextAction() {
+        if (!gameStarted) {
+            startGame();
+            return;
+        }
+
+        clearInterval(timerInterval);
+
+        if (phase === "memorize") {
+            startRecall();
+        } else if (phase === "recall") {
+            currentPhoto++;
+            if (currentPhoto >= photos.length) {
+                finishGame();
+            } else {
+                startMemorize();
+            }
+        }
+    }
+
+    function handlePrevAction() {
+        if (!gameStarted) return;
+
+        clearInterval(timerInterval);
+
+        if (phase === "recall") {
+            startMemorize();
+        } else if (phase === "memorize") {
+            if (currentPhoto > 0) {
+                currentPhoto--;
+                startRecall();
+            }
+        }
+    }
+
+    function finishGame() {
+        clearInterval(timerInterval);
+        gameStarted = false;
+
+        photo.classList.add("hidden");
+        hiddenPlaceholder.classList.add("hidden");
+        centerTimerBoxContainer.classList.add("hidden");
+        result.classList.remove("hidden");
+        topTimerBoxContainer.classList.add("hidden");
+        
+        btnPrev.classList.add("hidden");
+        btnNext.classList.add("hidden");
+
+        startConfetti();
+        playSound();
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen?.();
+        } else {
+            document.exitFullscreen?.();
+        }
+    }
+
+    /* Efek Konfeti Canvas */
+    let confettiAnimationId = null;
+    function startConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        const pieces = [];
+        const colors = ['#1769e0', '#ffc107', '#ff4757', '#2ed573', '#ffa502', '#9b59b6'];
+
+        for (let i = 0; i < 120; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: Math.random() * 10 + 6,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: Math.random() * 3 + 2,
+                rotation: Math.random() * 360,
+                rotSpeed: Math.random() * 4 - 2
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pieces.forEach(p => {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+
+                p.y += p.speed;
+                p.rotation += p.rotSpeed;
+
+                if (p.y > canvas.height) {
+                    p.y = -20;
+                    p.x = Math.random() * canvas.width;
+                }
+            });
+            confettiAnimationId = requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    function stopConfetti() {
+        if (confettiAnimationId) {
+            cancelAnimationFrame(confettiAnimationId);
+            confettiAnimationId = null;
+        }
+        const canvas = document.getElementById('confetti-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    document.addEventListener("keydown", (event) => {
+        if (event.code === "Space") {
+            event.preventDefault();
+            togglePause();
+        }
+
+        if (event.code === "Enter") {
+            event.preventDefault();
+            handleNextAction();
+        }
+
+        if (event.code === "Backspace" || event.key.toLowerCase() === "b" || event.key === "ArrowLeft") {
+            event.preventDefault();
+            handlePrevAction();
+        }
+
+        if (event.key === "ArrowRight") {
+            event.preventDefault();
+            handleNextAction();
+        }
+
+        if (event.key.toLowerCase() === "h") {
+            togglePhotoVisibility();
+        }
+
+        if (event.key.toLowerCase() === "r") {
+            resetCurrentPhaseTimer();
+        }
+
+        if (event.key.toLowerCase() === "f") {
+            toggleFullscreen();
+        }
+    });
+</script>
+</body>
+</html>
